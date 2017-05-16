@@ -2,11 +2,11 @@
 
 [Kubernetes]'s volumes are in a rough way understood as directorys which are accessible to the containers in a pod. 
 
-When using a [Microservice] architecture where all your services are loosely coupled, you may have a problem when scalig services that share files. Here you have to look for a solution, and a good aproach could be a distributed filesystem. 
+When using a [Microservice] architecture where all your services are loosely coupled, you may have a problem when scalig services that share files. A good aproach for this could be a distributed filesystem. 
 
 Kubernetes suports different kinds of [volumes], but most of them are persistent volumes, which lead to some problems when scaling.
 
-The volumes which can be integrated with the main cloud plattforms are:
+The volumes which can be integrated with the main cloud plattforms (AWS,GCP,Azure) are:
 + ``gcePersistentDisk``
 + ``awsElasticBlockStore``
 + ``azureFileVolume``
@@ -27,7 +27,7 @@ But looking into [AWS] and [GCP] products, you can find distributed systems amon
 [S3 Buckets]:https://aws.amazon.com/es/s3/
 [Cloud Storage]:https://cloud.google.com/storage/
 
-This means that we have to mount this filesistems in a "custom" way thus not being implemented natively.
+This means that we have to mount this filesystems in a "custom" way thus not being implemented natively.
 
 ## Distributed filesystem using Cloud Storage
 Google's [Cloud Storage] provides a object-based distributed filesystem which can be mounted into your container using Google´s [gcsfuse] [FUSE-based file system]. 
@@ -46,7 +46,7 @@ After downloading your JSON credentials file, create a secret object inside your
 ```
 kubectl create secret generic storage-auth-credentials --from-file=credentials=path/to/json
 ```
-After this, make sure that you use the secret and mount it as a volume inside the gcsfuse container. This looks like this:
+After this, make sure that you use the [secret] and mount it as a volume inside the gcsfuse container. This looks like this:
 ```
 # Define your volumes 
 volumes:
@@ -65,7 +65,7 @@ volumeMounts:
 ```
 
 ### Authenticate providing Google GKE cluster scope
-Another way to authenticate is [providing your GKE cluster the OAuth scope] ``storage-rw`` (Cloud Storage read/write). Automatically, all VMs created will have access to your buckets.It should look like this:
+Another way to authenticate is [providing your GKE cluster the OAuth scope] ``storage-rw`` (Cloud Storage read/write). Automatically, all VMs created (your cluster nodes) will have authenticated access to your buckets. It should look like this:
 ```
 gcloud container clusters create your-cluster --scopes=https://www.googleapis.com/auth/devstorage.read_write
 ```
@@ -73,11 +73,11 @@ gcloud container clusters create your-cluster --scopes=https://www.googleapis.co
 
 ### NGINX - GCSFUSE in same container
 ```
-docker build -f ./nginx-fuse/Dockerfile -t nginx-fuse:v1 .
+docker build -f ./nginx-gcsfuse/Dockerfile -t nginx-gcsfuse:v1 .
 # Running in docker
-docker run --privileged -d -p 8080:8080 nginx-fuse:v1
+docker run --privileged -d -p 8080:8080 nginx-gcsfuse:v1
 #Running in k8s
-kubectl create -f nginx-fuse-mono.yml
+kubectl create -f nginx-gcsfuse-mono.yml
 kubectl scale --replicas=3 deploy/nginx 
 ```
 
