@@ -20,7 +20,7 @@ RUN apt-get install -y nginx
 RUN rm -v /etc/nginx/nginx.conf
 
 # Set custom nginx config files
-ADD ./nginx-fuse/nginx.conf /etc/nginx/
+ADD ./nginx-gcsfuse/nginx.conf /etc/nginx/
 
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
