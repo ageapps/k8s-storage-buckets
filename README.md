@@ -77,7 +77,7 @@ docker build -f ./nginx-gcsfuse/Dockerfile -t nginx-gcsfuse:v1 .
 # Running in docker
 docker run --privileged -d -p 8080:8080 nginx-gcsfuse:v1
 #Running in k8s
-kubectl create -f nginx-gcsfuse-mono.yml
+kubectl create -f nginx-gcsfuse-mono.yaml
 kubectl scale --replicas=3 deploy/nginx 
 ```
 
@@ -86,6 +86,8 @@ Using an [emptyDir] volume mounted by a [initContainer]
 ```
 docker build -f ./nginx/Dockerfile -t nginx-front:v1 .
 docker build -f ./gcsfuse/Dockerfile -t gcsfuse-mounter:v1 .
+kubectl create -f nginx-gcsfuse-multi.yaml
+
 ```
 [emptyDir]:https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
 [initContainer]:https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
