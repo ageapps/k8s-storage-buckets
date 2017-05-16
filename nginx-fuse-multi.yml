@@ -1,0 +1,63 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: fuse-buckets
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: http
+  type: NodePort
+---  
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fuse-buckets
+    spec:
+      volumes:
+        - name: nginx-content
+          emptyDir: {}
+      containers:
+      # - name: "nginx"
+      #   image: "nginx-front:v1"
+      #   ports:
+      #     - name: http
+      #       containerPort: 8080
+      #   volumeMounts:
+      #     - name: nginx-content
+      #       mountPath: /content
+      #   lifecycle:
+      #       preStop:
+      #         exec:
+      #           command: ["/usr/sbin/nginx","-s","quit"]
+      - name: myapp
+        image: busybox
+        command: ['sh', '-c', 'echo The app is running! && sleep 5 && ls /content && sleep 36000']
+        volumeMounts:
+          - name: nginx-content
+            mountPath: /content
+      initContainers:
+      - name: gcsfuse-mounter
+        image: "gcsfuse-mounter:v1"
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        env:
+          - name: FUSE_MOUNT_DIR
+            value: "/gcsfuse/buckets/fuse-test-bucket"
+          - name: FUSE_BUCKET_NAME
+            value: "fuse-test-bucket"
+        volumeMounts:
+          - name: nginx-content
+            mountPath: /gcsfuse/buckets/fuse-test-bucket
+     

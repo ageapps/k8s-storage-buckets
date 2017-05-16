@@ -1,0 +1,64 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: fuse-buckets
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: http
+  # Use this with minikube
+  # type: NodePort
+  type: LoadBalancer
+---  
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fuse-buckets
+    spec:
+      containers:
+      - name: "nginx"
+        image: "gcr.io/fuse-test-167721/nginx-fuse:v1"
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        ports:
+          - name: http
+            containerPort: 8080
+        lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit","&&","fusermount", "-u", "$FUSE_MOUNT_DIR"]
+        env:
+          - name: FUSE_MOUNT_DIR
+            value: "/content"
+          - name: FUSE_BUCKET_NAME
+            value: "fuse-bucket-test"
+          # - name: GOOGLE_APPLICATION_CREDENTIALS
+          #   value: "/auth/storage-credentials.json"
+        # volumeMounts:
+        #   - name: storage-credentials
+        #     mountPath: /auth
+        #     readOnly: true
+      # volumes:
+      #   - name: storage-credentials
+      #     secret:
+      #       secretName: storage-auth-credentials
+      #       items:
+      #         - key: credentials
+      #           path: storage-credentials.json
+
+         
+
+
+     
