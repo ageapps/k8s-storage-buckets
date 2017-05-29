@@ -18,5 +18,3 @@ RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN apt-get update && apt-get install -y gcsfuse
 
 COPY setUp.sh .
-
-CMD /bin/bash ./setUp.sh

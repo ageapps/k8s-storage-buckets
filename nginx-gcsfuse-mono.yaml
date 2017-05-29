@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: "nginx"
-        image: "nginx-gcsfuse:v1"
+        image: "ageapps/k8s-storage-buckets:nginx-fuse"
         securityContext:
           privileged: true
           capabilities:

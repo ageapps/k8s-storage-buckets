@@ -26,18 +26,18 @@ spec:
         - name: nginx-content
           emptyDir: {}
       containers:
-      # - name: "nginx"
-      #   image: "nginx-front:v1"
-      #   ports:
-      #     - name: http
-      #       containerPort: 8080
-      #   volumeMounts:
-      #     - name: nginx-content
-      #       mountPath: /content
-      #   lifecycle:
-      #       preStop:
-      #         exec:
-      #           command: ["/usr/sbin/nginx","-s","quit"]
+      - name: "nginx"
+        image: "ageapps/k8s-storage-buckets:nginx"
+        ports:
+          - name: http
+            containerPort: 8080
+        volumeMounts:
+          - name: nginx-content
+            mountPath: /content
+        lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
       - name: myapp
         image: busybox
         command: ['sh', '-c', 'echo The app is running! && sleep 5 && ls /content && sleep 36000']
@@ -46,7 +46,8 @@ spec:
             mountPath: /content
       initContainers:
       - name: gcsfuse-mounter
-        image: "gcsfuse-mounter:v1"
+        image: "ageapps/k8s-storage-buckets:gcsfuse"
+        command: ['sh', '-c', 'bash /gcsfuse/setUp.sh']
         securityContext:
           privileged: true
           capabilities:
