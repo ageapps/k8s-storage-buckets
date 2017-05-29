@@ -4,6 +4,8 @@ MAINTAINER Adrián García <age.apps.dev@gmail.com>
 # Install needed tools
 RUN apt-get update && apt-get install -y lsb-release && apt-get install -y curl
 
+# COPY ./credentials . 
+
 WORKDIR /gcsfuse 
 
 ENV FUSE_MOUNT_DIR=/content
@@ -25,6 +27,6 @@ ADD ./nginx-gcsfuse/nginx.conf /etc/nginx/
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # Inject configurration script
-COPY ./gcsfuse/setUp.sh .
+COPY setUp.sh .
 
 CMD /bin/bash ./setUp.sh && service nginx start

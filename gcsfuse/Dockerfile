@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y lsb-release && apt-get install -y curl
 
 WORKDIR /gcsfuse 
 
-COPY ./credentials . 
+# COPY ./credentials . 
 
 ENV FUSE_MOUNT_DIR=/content
 ENV FUSE_BUCKET_NAME=fuse-test-bucket
@@ -17,6 +17,6 @@ RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 RUN apt-get update && apt-get install -y gcsfuse
 
-COPY ./gcsfuse/setUp.sh .
+COPY setUp.sh .
 
 CMD /bin/bash ./setUp.sh

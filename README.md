@@ -73,7 +73,7 @@ gcloud container clusters create your-cluster --scopes=https://www.googleapis.co
 
 ### NGINX - GCSFUSE in same container
 ```
-docker build -f ./nginx-gcsfuse/Dockerfile -t nginx-gcsfuse:v1 .
+docker build -t nginx-gcsfuse:v1 .
 # Running in docker
 docker run --privileged -d -p 8080:8080 nginx-gcsfuse:v1
 #Running in k8s
@@ -84,8 +84,8 @@ kubectl scale --replicas=3 deploy/nginx
 ### NGINX - GCSFUSE in k8s with init containers (NOT WORKING)
 Using an [emptyDir] volume mounted by a [initContainer]
 ```
-docker build -f ./nginx/Dockerfile -t nginx-front:v1 .
-docker build -f ./gcsfuse/Dockerfile -t gcsfuse-mounter:v1 .
+docker build -t nginx-front:v1 .
+docker build -t gcsfuse-mounter:v1 .
 kubectl create -f nginx-gcsfuse-multi.yaml
 
 ```
