@@ -81,13 +81,10 @@ kubectl create -f nginx-gcsfuse-mono.yaml
 kubectl scale --replicas=3 deploy/nginx 
 ```
 
-### NGINX - GCSFUSE in k8s with init containers (NOT WORKING)
+### NGINX - GCSFUSE in k8s with init containers (Just Read Access)
 Using an [emptyDir] volume mounted by a [initContainer]
 ```
-docker build -t nginx-front:v1 .
-docker build -t gcsfuse-mounter:v1 .
-kubectl create -f nginx-gcsfuse-multi.yaml
-
+kubectl create -f nginx-gcsfuse-init.yaml
 ```
 [emptyDir]:https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
 [initContainer]:https://kubernetes.io/docs/concepts/workloads/pods/init-containers/

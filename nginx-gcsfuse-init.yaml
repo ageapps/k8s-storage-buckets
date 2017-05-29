@@ -9,7 +9,8 @@ spec:
     - protocol: "TCP"
       port: 8080
       targetPort: http
-  type: NodePort
+  # type: NodePort
+  type: LoadBalancer
 ---  
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -32,27 +33,24 @@ spec:
               - key: credentials
                 path: storage-credentials.json     
       containers:
-      # - name: "nginx"
-      #   image: "ageapps/k8s-storage-buckets:nginx"
-      #   ports:
-      #     - name: http
-      #       containerPort: 8080
-      #   volumeMounts:
-      #     - name: nginx-content
-      #       mountPath: /content
-      #   lifecycle:
-      #       preStop:
-      #         exec:
-      #           command: ["/usr/sbin/nginx","-s","quit"]
-      - name: test-container
-        image: alpine
-        command: ['sh', '-c', 'apk update && apk add curl && sleep 18000']
+      - name: "nginx"
+        image: "ageapps/k8s-storage-buckets:nginx"
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 8080
         volumeMounts:
           - name: nginx-content
             mountPath: /content
+        lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
       initContainers:
       - name: gcsfuse-mounter
         image: "ageapps/k8s-storage-buckets:gcsfuse-init"
+        imagePullPolicy: Always
+        # image: "gcsfuse-init:v1"
         command: ['sh', '-c', 'bash /gcsfuse/setUp.sh']
         securityContext:
           privileged: true
@@ -60,8 +58,10 @@ spec:
             add:
               - SYS_ADMIN
         env:
-          - name: FUSE_MOUNT_DIR
+          - name: DESTINATION_DIR
             value: "/gcsfuse/buckets/fuse-test-bucket"
+          - name: FUSE_MOUNT_DIR
+            value: "/gcsfuse/buckets/temp"
           - name: FUSE_BUCKET_NAME
             value: "test-k8s-bucket"
           - name: GOOGLE_APPLICATION_CREDENTIALS
