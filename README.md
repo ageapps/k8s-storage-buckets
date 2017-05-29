@@ -34,6 +34,10 @@ Google's [Cloud Storage] provides a object-based distributed filesystem which ca
 
 Here are steps needed to achieve this through a practical example.
 
+
+![art1](./art/art1.png)
+![art2](./art/art2.png)
+
 [gcsfuse]:https://github.com/GoogleCloudPlatform/gcsfuse
 ### Authenticate with Google API credentials JSON
 
