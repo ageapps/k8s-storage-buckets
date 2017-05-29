@@ -7,7 +7,7 @@ spec:
     app: fuse-buckets
   ports:
     - protocol: "TCP"
-      port: 8080
+      port: 80
       targetPort: http
   # Use this with minikube
   # type: NodePort
@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: "nginx"
-        image: "ageapps/k8s-storage-buckets:nginx-fuse"
+        image: "ageapps/k8s-storage-buckets:nginx-gcsfuse"
         securityContext:
           privileged: true
           capabilities:
@@ -43,22 +43,17 @@ spec:
           - name: FUSE_MOUNT_DIR
             value: "/content"
           - name: FUSE_BUCKET_NAME
-            value: "fuse-bucket-test"
-          # - name: GOOGLE_APPLICATION_CREDENTIALS
-          #   value: "/auth/storage-credentials.json"
-        # volumeMounts:
-        #   - name: storage-credentials
-        #     mountPath: /auth
-        #     readOnly: true
+            value: "test-k8s-bucket"
+      #     - name: GOOGLE_APPLICATION_CREDENTIALS
+      #       value: "/auth/storage-credentials.json"
+      #   volumeMounts:
+      #     - name: storage-credentials
+      #       mountPath: /auth
+      #       readOnly: true
       # volumes:
       #   - name: storage-credentials
       #     secret:
       #       secretName: storage-auth-credentials
       #       items:
       #         - key: credentials
-      #           path: storage-credentials.json
-
-         
-
-
-     
+      #           path: storage-credentials.json     

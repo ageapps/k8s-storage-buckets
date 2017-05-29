@@ -38,15 +38,8 @@ spec:
             preStop:
               exec:
                 command: ["/usr/sbin/nginx","-s","quit"]
-      - name: myapp
-        image: busybox
-        command: ['sh', '-c', 'echo The app is running! && sleep 5 && ls /content && sleep 36000']
-        volumeMounts:
-          - name: nginx-content
-            mountPath: /content
-      initContainers:
       - name: gcsfuse-mounter
-        image: "ageapps/k8s-storage-buckets:gcsfuse"
+        image: "ageapps/k8s-storage-buckets:gcsfuse-sync"
         command: ['sh', '-c', 'bash /gcsfuse/setUp.sh']
         securityContext:
           privileged: true

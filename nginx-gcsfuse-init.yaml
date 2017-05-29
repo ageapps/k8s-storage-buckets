@@ -1,0 +1,74 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: fuse-buckets
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: http
+  type: NodePort
+---  
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fuse-buckets
+    spec:
+      volumes:
+        - name: nginx-content
+          emptyDir: {}
+        - name: storage-credentials
+          secret:
+            secretName: storage-auth-credentials
+            items:
+              - key: credentials
+                path: storage-credentials.json     
+      containers:
+      # - name: "nginx"
+      #   image: "ageapps/k8s-storage-buckets:nginx"
+      #   ports:
+      #     - name: http
+      #       containerPort: 8080
+      #   volumeMounts:
+      #     - name: nginx-content
+      #       mountPath: /content
+      #   lifecycle:
+      #       preStop:
+      #         exec:
+      #           command: ["/usr/sbin/nginx","-s","quit"]
+      - name: test-container
+        image: alpine
+        command: ['sh', '-c', 'apk update && apk add curl && sleep 18000']
+        volumeMounts:
+          - name: nginx-content
+            mountPath: /content
+      initContainers:
+      - name: gcsfuse-mounter
+        image: "ageapps/k8s-storage-buckets:gcsfuse-init"
+        command: ['sh', '-c', 'bash /gcsfuse/setUp.sh']
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        env:
+          - name: FUSE_MOUNT_DIR
+            value: "/gcsfuse/buckets/fuse-test-bucket"
+          - name: FUSE_BUCKET_NAME
+            value: "test-k8s-bucket"
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/auth/storage-credentials.json"
+        volumeMounts:
+          - name: storage-credentials
+            mountPath: /auth
+            readOnly: true
+          - name: nginx-content
+            mountPath: /gcsfuse/buckets/fuse-test-bucket
